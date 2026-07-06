@@ -93,9 +93,10 @@ function renderTable(licenses) {
 
   licenses.forEach(lic => {
     const tr = document.createElement('tr');
-    const expiresLabel = lic.expiresAt ? new Date(lic.expiresAt).toLocaleDateString('ms-MY') : '-';
+    const isLifetime = lic.plan === 'lifetime';
+    const expiresLabel = isLifetime ? 'Tiada Tamat Tempoh' : (lic.expiresAt ? new Date(lic.expiresAt).toLocaleDateString('ms-MY') : '-');
     const daysLeft = lic.expiresAt ? Math.ceil((new Date(lic.expiresAt) - new Date()) / 86400000) : null;
-    const expiresExtra = (lic.status === 'active' && daysLeft !== null) ? ` (${daysLeft} hari lagi)` : '';
+    const expiresExtra = (!isLifetime && lic.status === 'active' && daysLeft !== null) ? ` (${daysLeft} hari lagi)` : '';
 
     tr.innerHTML = `
       <td class="code-cell">${formatCode(lic.code)}</td>
@@ -109,6 +110,7 @@ function renderTable(licenses) {
           <option value="monthly">Bulanan</option>
           <option value="halfyearly">Separuh Tahun</option>
           <option value="yearly">Tahunan</option>
+          <option value="lifetime">Lifetime</option>
         </select>
         <button data-action="renew" class="btn-primary">Perbaharui</button>
         <button data-action="revoke" class="btn-secondary">Batal</button>

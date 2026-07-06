@@ -14,7 +14,7 @@ app.use(session({
   secret: 'solat-tv-license-local-secret-change-if-you-want',
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 1000 * 60 * 60 * 12 }
+  cookie: { maxAge: 1000 * 60 * 60 * 24 * 30 } // 30 days
 }));
 
 function requireAdmin(req, res, next) {
@@ -29,6 +29,17 @@ app.post('/api/license/verify', (req, res) => {
     return res.status(400).json({ ok: false, error: 'code dan deviceId diperlukan' });
   }
   const result = store.verifyAndBind(String(code).trim(), String(deviceId).trim());
+  res.json(result);
+});
+
+// One-time 10-day demo, automatically requested by the app on first launch
+// (no code needed) — tracked by deviceId so it can't be reset by reinstalling.
+app.post('/api/demo/start', (req, res) => {
+  const { deviceId } = req.body;
+  if (!deviceId) {
+    return res.status(400).json({ ok: false, error: 'deviceId diperlukan' });
+  }
+  const result = store.startDemo(String(deviceId).trim());
   res.json(result);
 });
 
@@ -66,7 +77,7 @@ app.get('/api/admin/licenses', requireAdmin, (req, res) => {
 
 app.post('/api/admin/licenses', requireAdmin, (req, res) => {
   const { masjidName, plan, notes } = req.body;
-  if (!plan || !store.PLAN_DAYS[plan]) {
+  if (!plan || !store.PLAN_DAYS[plan] || plan === 'demo') {
     return res.status(400).json({ ok: false, error: 'Pelan tidak sah' });
   }
   const license = store.createLicense({ masjidName, plan, notes });
@@ -75,7 +86,7 @@ app.post('/api/admin/licenses', requireAdmin, (req, res) => {
 
 app.post('/api/admin/licenses/:code/renew', requireAdmin, (req, res) => {
   const { plan } = req.body;
-  if (!plan || !store.PLAN_DAYS[plan]) {
+  if (!plan || !store.PLAN_DAYS[plan] || plan === 'demo') {
     return res.status(400).json({ ok: false, error: 'Pelan tidak sah' });
   }
   const result = store.renewLicense(req.params.code, plan);

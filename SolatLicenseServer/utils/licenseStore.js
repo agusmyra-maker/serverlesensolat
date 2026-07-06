@@ -8,13 +8,17 @@ const DEFAULT_PATH = path.join(DATA_DIR, 'licenses.default.json');
 const PLAN_DAYS = {
   monthly: 30,
   halfyearly: 182,
-  yearly: 365
+  yearly: 365,
+  lifetime: 36500, // effectively permanent (100 years)
+  demo: 10
 };
 
 const PLAN_LABELS = {
   monthly: 'Bulanan',
   halfyearly: 'Separuh Tahun',
-  yearly: 'Tahunan'
+  yearly: 'Tahunan',
+  lifetime: 'Lifetime',
+  demo: 'Demo (Percubaan)'
 };
 
 function ensureDbExists() {
@@ -25,7 +29,9 @@ function ensureDbExists() {
 
 function readDb() {
   ensureDbExists();
-  return JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
+  const db = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
+  if (!db.demos) db.demos = []; // upgrade older data files that predate the demo feature
+  return db;
 }
 
 function writeDb(db) {
@@ -154,9 +160,29 @@ function setAdminPassword(newPassword) {
   writeDb(db);
 }
 
+/**
+ * Grants a one-time 10-day demo for a device that has never had one before.
+ * Tracked by deviceId (survives app reinstalls, since it's tied to the
+ * physical device) so a masjid can't just reinstall the app for endless
+ * free demos.
+ */
+function startDemo(deviceId) {
+  const db = readDb();
+  const existing = db.demos.find(d => d.deviceId === deviceId);
+  if (existing) {
+    return { ok: false, error: 'Demo telah digunakan pada peranti ini. Sila masukkan kod langganan.' };
+  }
+
+  const expiresAt = addDays(new Date(), PLAN_DAYS.demo).toISOString();
+  db.demos.push({ deviceId, activatedAt: new Date().toISOString(), expiresAt });
+  writeDb(db);
+  return { ok: true, expiresAt, plan: 'demo' };
+}
+
 module.exports = {
   PLAN_DAYS, PLAN_LABELS,
   createLicense, findLicense, listLicenses,
   verifyAndBind, renewLicense, revokeLicense, deleteLicense,
-  getAdminPassword, setAdminPassword
+  getAdminPassword, setAdminPassword,
+  startDemo
 };
