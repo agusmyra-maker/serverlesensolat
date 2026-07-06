@@ -1,0 +1,13 @@
+{
+  "name": "solat-tv-license-server",
+  "version": "1.0.0",
+  "description": "Simple self-managed licensing server for Solat TV — issue, activate, renew and revoke numeric license codes.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "express-session": "^1.18.0"
+  }
+}

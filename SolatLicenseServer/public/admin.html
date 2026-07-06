@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Lesen Solat TV</title>
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+  <div id="loginScreen" class="login-screen">
+    <div class="login-box">
+      <h1>Log Masuk Admin Lesen</h1>
+      <input id="loginPassword" type="password" placeholder="Kata laluan" />
+      <button id="btnLogin">Log Masuk</button>
+      <div id="loginError" class="error-text"></div>
+      <p class="hint">Kata laluan lalai: <code>admin123</code> — sila tukar selepas log masuk.</p>
+    </div>
+  </div>
+
+  <div id="adminScreen" class="admin-screen hidden">
+    <header class="admin-header">
+      <h1>Pengurusan Lesen Solat TV</h1>
+      <button id="btnLogout" class="btn-secondary">Log Keluar</button>
+    </header>
+
+    <section class="panel">
+      <h2>+ Jana Lesen Baharu</h2>
+      <div class="form-row">
+        <input id="newMasjidName" type="text" placeholder="Nama masjid/surau (untuk rekod anda)" />
+        <select id="newPlan">
+          <option value="monthly">Bulanan (30 hari)</option>
+          <option value="halfyearly">Separuh Tahun (182 hari)</option>
+          <option value="yearly">Tahunan (365 hari)</option>
+        </select>
+        <button id="btnCreate" class="btn-primary">Jana Kod</button>
+      </div>
+      <input id="newNotes" type="text" placeholder="Nota (pilihan)" style="margin-top:8px;" />
+      <div id="createResult" class="create-result"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header-row">
+        <h2>Senarai Lesen</h2>
+        <button id="btnRefresh" class="btn-secondary">Muat Semula</button>
+      </div>
+      <table id="licenseTable">
+        <thead>
+          <tr>
+            <th>Kod</th>
+            <th>Masjid</th>
+            <th>Pelan</th>
+            <th>Status</th>
+            <th>Tamat Tempoh</th>
+            <th>Peranti Terikat</th>
+            <th>Tindakan</th>
+          </tr>
+        </thead>
+        <tbody id="licenseTableBody"></tbody>
+      </table>
+    </section>
+
+    <section class="panel">
+      <h2>Tukar Kata Laluan Admin</h2>
+      <div class="form-row">
+        <input id="inputNewPassword" type="password" placeholder="Kata laluan baharu" />
+        <button id="btnChangePassword" class="btn-primary">Tukar</button>
+      </div>
+      <div id="passwordStatus" class="hint"></div>
+    </section>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
